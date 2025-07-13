@@ -1,0 +1,21 @@
+CREATE TABLE urls (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  url VARCHAR(2048) NOT NULL,
+  status ENUM('queued', 'processing', 'done', 'error') NOT NULL DEFAULT 'queued',
+  html_version VARCHAR(64),
+  title TEXT,
+  h1 INT DEFAULT 0,
+  h2 INT DEFAULT 0,
+  h3 INT DEFAULT 0,
+  h4 INT DEFAULT 0,
+  h5 INT DEFAULT 0,
+  h6 INT DEFAULT 0,
+  internal_links INT DEFAULT 0,
+  external_links INT DEFAULT 0,
+  broken_links INT DEFAULT 0,
+  has_login_form BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
