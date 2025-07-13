@@ -4,7 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	"crawlzilla-backend/internal/model"
+	"crawlzilla-backend/internal/models"
+	"crawlzilla-backendinternal/db"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,18 +14,19 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		auth := c.GetHeader("Authorization")
 		if auth == "" || !strings.HasPrefix(auth, "Bearer ") {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Missing or invalid token"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Missing or invalid Authorization header"})
 			return
 		}
 
 		token := strings.TrimPrefix(auth, "Bearer ")
-		user, err := model.GetUserByToken(token)
+
+		var user models.User
+		err := db.DB.Get(&user, "SELECT * FROM users WHERE api_token = ?", token)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid API token"})
 			return
 		}
 
-		// Set user in context
 		c.Set("user", user)
 		c.Next()
 	}
